@@ -1,2 +1,2 @@
 # arunodaya
-Arunodaya ABPS Science Learning 
+Arunodaya Science Learning 
