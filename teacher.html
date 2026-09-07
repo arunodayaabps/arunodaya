@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Teacher Dashboard | Arunodaya Science</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+
+:root{
+  --green:#126b45;
+  --deep:#073b29;
+  --mint:#dff7eb;
+  --ink:#12251b;
+  --muted:#66776d;
+  --line:#dcebe2;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:'DM Sans',Arial,sans-serif;
+  color:var(--ink);
+  background:#f5faf7;
+}
+
+.header{
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  padding:18px 6%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo{
+  font-family:'Plus Jakarta Sans';
+  font-weight:800;
+  color:var(--deep);
+  font-size:20px;
+}
+
+.logout{
+  border:0;
+  background:#ffecec;
+  color:#a51d1d;
+  padding:10px 15px;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.wrap{
+  max-width:1150px;
+  margin:auto;
+  padding:30px 18px 70px;
+}
+
+h1{
+  font-family:'Plus Jakarta Sans';
+  margin:0;
+  font-size:34px;
+}
+
+.subtitle{
+  color:var(--muted);
+  margin:8px 0 30px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:25px;
+}
+
+.card h2{
+  font-family:'Plus Jakarta Sans';
+  margin-top:0;
+}
+
+label{
+  display:block;
+  font-weight:700;
+  font-size:14px;
+  margin:15px 0 7px;
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #cbdacf;
+  border-radius:10px;
+  font:inherit;
+  background:#fff;
+}
+
+button.primary{
+  margin-top:18px;
+  width:100%;
+  padding:13px;
+  border:0;
+  border-radius:11px;
+  background:var(--green);
+  color:#fff;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.message{
+  margin-top:14px;
+  padding:11px;
+  border-radius:10px;
+  display:none;
+  font-size:14px;
+}
+
+.success{
+  background:#e9fff3;
+  color:#126b45;
+}
+
+.error{
+  background:#fff0f0;
+  color:#a51d1d;
+}
+
+.activity{
+  margin-top:20px;
+}
+
+.student{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:15px;
+  margin-top:10px;
+  background:#fbfefc;
+}
+
+.student b{
+  color:var(--deep);
+}
+
+.empty{
+  color:var(--muted);
+  font-size:14px;
+}
+
+@media(max-width:800px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:28px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+  <div class="logo">
+    🧪 Arunodaya Science — Teacher Dashboard
+  </div>
+
+  <button class="logout" id="logoutBtn">
+    Logout
+  </button>
+
+</header>
+
+<main class="wrap">
+
+  <h1>Teacher Dashboard</h1>
+
+  <p class="subtitle">
+    Manage Science learning materials and view student activity.
+  </p>
+
+  <section class="grid">
+
+    <div class="card">
+
+      <h2>📚 Add Study Material</h2>
+
+      <form id="materialForm">
+
+        <label>Class</label>
+
+        <select id="className" required>
+          <option value="">Select Class</option>
+          <option value="6">Class 6</option>
+          <option value="7">Class 7</option>
+          <option value="8">Class 8</option>
+        </select>
+
+        <label>Chapter</label>
+
+        <input
+          id="chapter"
+          type="text"
+          placeholder="Enter chapter name"
+          required
+        >
+
+        <label>Material Name</label>
+
+        <input
+          id="materialName"
+          type="text"
+          placeholder="Example: Chapter Notes"
+          required
+        >
+
+        <label>File</label>
+
+        <input
+          id="file"
+          type="file"
+          required
+        >
+
+        <button class="primary" type="submit">
+          Upload Material
+        </button>
+
+      </form>
+
+      <div id="materialMessage" class="message"></div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>👨‍🎓 Student Activity</h2>
+
+      <div id="activityList">
+        <p class="empty">
+          Loading student activity...
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+  "https://ttuhcdgclnsxhoypfwhk.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_u_U8gTism0c2pgGLlh-FIw_m4re6VSG";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+
+// Check login
+
+async function checkTeacher(){
+
+  const { data, error } =
+    await supabase.auth.getUser();
+
+  if(error || !data.user){
+
+    window.location.href = "login.html";
+    return null;
+
+  }
+
+  const { data: profile } =
+    await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .single();
+
+  if(!profile || profile.role !== "teacher"){
+
+    await supabase.auth.signOut();
+
+    alert("Teacher access required.");
+
+    window.location.href = "login.html";
+
+    return null;
+
+  }
+
+  return data.user;
+
+}
+
+
+// Logout
+
+document
+.getElementById("logoutBtn")
+.addEventListener("click", async function(){
+
+  await supabase.auth.signOut();
+
+  window.location.href = "login.html";
+
+});
+
+
+// Upload material
+
+document
+.getElementById("materialForm")
+.addEventListener("submit", async function(e){
+
+  e.preventDefault();
+
+  const message =
+    document.getElementById("materialMessage");
+
+  message.style.display = "none";
+
+  const user = await checkTeacher();
+
+  if(!user) return;
+
+
+  const className =
+    document.getElementById("className").value;
+
+  const chapter =
+    document.getElementById("chapter").value.trim();
+
+  const materialName =
+    document.getElementById("materialName").value.trim();
+
+  const file =
+    document.getElementById("file").files[0];
+
+
+  if(!file){
+
+    message.textContent = "Please select a file.";
+
+    message.className = "message error";
+
+    message.style.display = "block";
+
+    return;
+
+  }
+
+
+  try{
+
+    const fileName =
+      Date.now() + "_" +
+      file.name.replace(/\s+/g,"_");
+
+
+    const filePath =
+      "class" + className + "/" + fileName;
+
+
+    const { error: uploadError } =
+      await supabase.storage
+        .from("study-materials")
+        .upload(filePath,file);
+
+
+    if(uploadError){
+
+      throw uploadError;
+
+    }
+
+
+    const { data: publicData } =
+      supabase.storage
+        .from("study-materials")
+        .getPublicUrl(filePath);
+
+
+    const { error: insertError } =
+      await supabase
+        .from("study_material")
+        .insert({
+
+          class: className,
+          chapter: chapter,
+          title: materialName,
+          file_url: publicData.publicUrl
+
+        });
+
+
+    if(insertError){
+
+      throw insertError;
+
+    }
+
+
+    message.textContent =
+      "Material uploaded successfully!";
+
+    message.className =
+      "message success";
+
+    message.style.display =
+      "block";
+
+
+    document
+      .getElementById("materialForm")
+      .reset();
+
+  }
+
+  catch(error){
+
+    message.textContent =
+      error.message || "Upload failed.";
+
+    message.className =
+      "message error";
+
+    message.style.display =
+      "block";
+
+  }
+
+});
+
+
+// Load student activity
+
+async function loadActivity(){
+
+  const user = await checkTeacher();
+
+  if(!user) return;
+
+
+  const activityList =
+    document.getElementById("activityList");
+
+
+  const { data, error } =
+    await supabase
+      .from("student_activity")
+      .select("*")
+      .order("created_at",{ascending:false})
+      .limit(30);
+
+
+  if(error){
+
+    activityList.innerHTML =
+      '<p class="empty">Unable to load activity.</p>';
+
+    return;
+
+  }
+
+
+  if(!data || data.length === 0){
+
+    activityList.innerHTML =
+      '<p class="empty">No student activity yet.</p>';
+
+    return;
+
+  }
+
+
+  activityList.innerHTML =
+    data.map(function(item){
+
+      return `
+        <div class="student">
+          <b>${item.student_name || "Student"}</b>
+          <br>
+          <span>${item.email || ""}</span>
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+
+checkTeacher().then(function(user){
+
+  if(user){
+
+    loadActivity();
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
