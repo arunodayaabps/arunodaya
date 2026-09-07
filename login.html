@@ -3,31 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
 <title>Teacher / Admin Login | Arunodaya Science</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
-
-:root{
-  --green:#126b45;
-  --deep:#073b29;
-  --mint:#dff7eb;
-  --ink:#12251b;
-  --muted:#66776d;
-  --line:#dcebe2;
-}
-
-*{
-  box-sizing:border-box;
-}
-
 body{
   margin:0;
   min-height:100vh;
-  font-family:'DM Sans',Arial,sans-serif;
+  font-family:Arial,sans-serif;
   background:linear-gradient(135deg,#e8fff2,#e7f4ff);
-  color:var(--ink);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -37,100 +20,54 @@ body{
 .login-box{
   width:100%;
   max-width:430px;
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:28px;
+  background:white;
+  border-radius:25px;
   padding:35px;
-  box-shadow:0 25px 70px #124a2b18;
-}
-
-.logo{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  font-family:'Plus Jakarta Sans';
-  font-weight:800;
-  font-size:22px;
-  color:var(--deep);
-  margin-bottom:28px;
-}
-
-.logo-mark{
-  width:44px;
-  height:44px;
-  border-radius:14px;
-  background:linear-gradient(135deg,#79e0b0,#4daeff);
-  display:grid;
-  place-items:center;
-  color:white;
-  font-size:22px;
+  box-shadow:0 20px 60px #0002;
 }
 
 h1{
-  font-family:'Plus Jakarta Sans';
   text-align:center;
-  margin:0 0 8px;
-  font-size:28px;
 }
 
 .subtitle{
   text-align:center;
-  color:var(--muted);
-  margin:0 0 28px;
+  color:#66776d;
 }
 
 label{
   display:block;
-  font-weight:700;
-  font-size:14px;
-  margin:16px 0 7px;
+  font-weight:bold;
+  margin:18px 0 7px;
 }
 
 input{
   width:100%;
-  padding:13px 14px;
+  padding:13px;
+  box-sizing:border-box;
   border:1px solid #cbdacf;
   border-radius:12px;
-  background:#fff;
-  font:inherit;
-  outline:none;
-}
-
-input:focus{
-  border-color:var(--green);
-  box-shadow:0 0 0 3px #126b4512;
+  font-size:16px;
 }
 
 button{
   width:100%;
-  margin-top:24px;
+  margin-top:25px;
   padding:14px;
   border:0;
   border-radius:13px;
-  background:var(--green);
-  color:#fff;
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
+  background:#126b45;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
 }
 
-button:hover{
-  background:var(--deep);
-}
-
-button:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-}
-
-.message{
-  display:none;
-  margin-top:16px;
-  padding:12px 14px;
-  border-radius:11px;
-  font-size:14px;
+#message{
+  margin-top:15px;
+  padding:12px;
   text-align:center;
+  display:none;
+  border-radius:10px;
 }
 
 .error{
@@ -146,12 +83,10 @@ button:disabled{
 .back{
   display:block;
   text-align:center;
-  margin-top:22px;
-  color:var(--green);
-  font-weight:700;
-  font-size:14px;
+  margin-top:20px;
+  color:#126b45;
+  font-weight:bold;
 }
-
 </style>
 </head>
 
@@ -159,172 +94,167 @@ button:disabled{
 
 <div class="login-box">
 
-  <div class="logo">
-    <span class="logo-mark">🧪</span>
-    Arunodaya Science
-  </div>
+<h1>🧪 Arunodaya Science</h1>
 
-  <h1>Teacher / Admin Login</h1>
+<p class="subtitle">
+Teacher / Admin Login
+</p>
 
-  <p class="subtitle">
-    Sign in to manage the Science learning portal.
-  </p>
+<form id="loginForm">
 
-  <form id="loginForm">
+<label>Email</label>
 
-    <label for="email">Email</label>
+<input
+type="email"
+id="email"
+placeholder="Enter your email"
+required
+>
 
-    <input
-      type="email"
-      id="email"
-      placeholder="Enter your email"
-      required
-    >
+<label>Password</label>
 
-    <label for="password">Password</label>
+<input
+type="password"
+id="password"
+placeholder="Enter your password"
+required
+>
 
-    <input
-      type="password"
-      id="password"
-      placeholder="Enter your password"
-      required
-    >
+<button type="submit" id="loginBtn">
+Login
+</button>
 
-    <button type="submit" id="loginBtn">
-      Login
-    </button>
+</form>
 
-  </form>
+<div id="message"></div>
 
-  <div id="message" class="message"></div>
-
-  <a class="back" href="index.html">
-    ← Back to Home
-  </a>
+<a class="back" href="index.html">
+← Back to Home
+</a>
 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-<script type="text/javascript">
+
+<script>
 
 const SUPABASE_URL =
-  "https://ttuhcdgclnsxhoypfwhk.supabase.co";
+"https://ttuhcdgclnsxhoypfwhk.supabase.co";
 
 const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_u_U8gTism0c2pgGLlh-FIw_m4re6VSG";
+"sb_publishable_u_U8gTism0c2pgGLlh-FIw_m4re6VSG";
 
-const supabase = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
+const supabaseClient =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_PUBLISHABLE_KEY
 );
 
-const form = document.getElementById("loginForm");
-const loginBtn = document.getElementById("loginBtn");
-const message = document.getElementById("message");
+const form =
+document.getElementById("loginForm");
 
-function showMessage(text, type){
+const message =
+document.getElementById("message");
 
-  message.textContent = text;
+const loginBtn =
+document.getElementById("loginBtn");
 
-  message.className = "message " + type;
+form.addEventListener("submit", async function(event){
 
-  message.style.display = "block";
+event.preventDefault();
+
+loginBtn.disabled=true;
+loginBtn.textContent="Logging in...";
+
+message.style.display="none";
+
+const email =
+document.getElementById("email").value.trim();
+
+const password =
+document.getElementById("password").value;
+
+try{
+
+const result =
+await supabaseClient.auth.signInWithPassword({
+email:email,
+password:password
+});
+
+if(result.error){
+throw result.error;
+}
+
+const user=result.data.user;
+
+const profileResult =
+await supabaseClient
+.from("profiles")
+.select("role")
+.eq("id",user.id)
+.single();
+
+if(profileResult.error){
+throw new Error(
+"Login worked, but your profile was not found."
+);
+}
+
+const role=profileResult.data.role;
+
+if(role==="teacher"){
+
+message.textContent=
+"Teacher login successful. Opening dashboard...";
+
+message.className="success";
+message.style.display="block";
+
+setTimeout(function(){
+window.location.href="teacher.html";
+},1000);
 
 }
 
-form.addEventListener("submit", async function(e){
+else if(role==="admin"){
 
-  e.preventDefault();
+message.textContent=
+"Admin login successful. Opening dashboard...";
 
-  message.style.display = "none";
+message.className="success";
+message.style.display="block";
 
-  loginBtn.disabled = true;
-  loginBtn.textContent = "Logging in...";
+setTimeout(function(){
+window.location.href="admin-dashboard.html";
+},1000);
 
-  const email =
-    document.getElementById("email").value.trim();
+}
 
-  const password =
-    document.getElementById("password").value;
+else{
 
-  try{
+await supabaseClient.auth.signOut();
 
-    const { data, error } =
-      await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
+throw new Error(
+"Account is not authorized as Teacher or Admin."
+);
 
-    if(error){
-      throw error;
-    }
+}
 
-    const user = data.user;
+}
 
-    const { data: profile, error: profileError } =
-      await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
+catch(error){
 
-    if(profileError){
-      await supabase.auth.signOut();
-      throw new Error(
-        "Your account profile could not be found."
-      );
-    }
+message.textContent=
+error.message || "Login failed.";
 
-    if(profile.role === "teacher"){
+message.className="error";
+message.style.display="block";
 
-      showMessage(
-        "Teacher login successful. Opening dashboard...",
-        "success"
-      );
+loginBtn.disabled=false;
+loginBtn.textContent="Login";
 
-      setTimeout(function(){
-        window.location.href = "teacher.html";
-      }, 700);
-
-    }
-
-    else if(profile.role === "admin"){
-
-      showMessage(
-        "Admin login successful. Opening dashboard...",
-        "success"
-      );
-
-      setTimeout(function(){
-        window.location.href = "admin-dashboard.html";
-      }, 700);
-
-    }
-
-    else{
-
-      await supabase.auth.signOut();
-
-      throw new Error(
-        "This account is not authorized as Teacher or Admin."
-      );
-
-    }
-
-  }
-
-  catch(error){
-
-    showMessage(
-      error.message || "Login failed. Please try again.",
-      "error"
-    );
-
-    loginBtn.disabled = false;
-    loginBtn.textContent = "Login";
-
-  }
+}
 
 });
 
