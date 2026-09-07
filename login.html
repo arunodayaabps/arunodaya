@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Teacher / Admin Login | Arunodaya Science</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+
+:root{
+  --green:#126b45;
+  --deep:#073b29;
+  --mint:#dff7eb;
+  --ink:#12251b;
+  --muted:#66776d;
+  --line:#dcebe2;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:'DM Sans',Arial,sans-serif;
+  background:linear-gradient(135deg,#e8fff2,#e7f4ff);
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.login-box{
+  width:100%;
+  max-width:430px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:35px;
+  box-shadow:0 25px 70px #124a2b18;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  font-family:'Plus Jakarta Sans';
+  font-weight:800;
+  font-size:22px;
+  color:var(--deep);
+  margin-bottom:28px;
+}
+
+.logo-mark{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#79e0b0,#4daeff);
+  display:grid;
+  place-items:center;
+  color:white;
+  font-size:22px;
+}
+
+h1{
+  font-family:'Plus Jakarta Sans';
+  text-align:center;
+  margin:0 0 8px;
+  font-size:28px;
+}
+
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin:0 0 28px;
+}
+
+label{
+  display:block;
+  font-weight:700;
+  font-size:14px;
+  margin:16px 0 7px;
+}
+
+input{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #cbdacf;
+  border-radius:12px;
+  background:#fff;
+  font:inherit;
+  outline:none;
+}
+
+input:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px #126b4512;
+}
+
+button{
+  width:100%;
+  margin-top:24px;
+  padding:14px;
+  border:0;
+  border-radius:13px;
+  background:var(--green);
+  color:#fff;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button:hover{
+  background:var(--deep);
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.message{
+  display:none;
+  margin-top:16px;
+  padding:12px 14px;
+  border-radius:11px;
+  font-size:14px;
+  text-align:center;
+}
+
+.error{
+  background:#fff0f0;
+  color:#a51d1d;
+}
+
+.success{
+  background:#e9fff3;
+  color:#126b45;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  margin-top:22px;
+  color:var(--green);
+  font-weight:700;
+  font-size:14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+  <div class="logo">
+    <span class="logo-mark">🧪</span>
+    Arunodaya Science
+  </div>
+
+  <h1>Teacher / Admin Login</h1>
+
+  <p class="subtitle">
+    Sign in to manage the Science learning portal.
+  </p>
+
+  <form id="loginForm">
+
+    <label for="email">Email</label>
+
+    <input
+      type="email"
+      id="email"
+      placeholder="Enter your email"
+      required
+    >
+
+    <label for="password">Password</label>
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Enter your password"
+      required
+    >
+
+    <button type="submit" id="loginBtn">
+      Login
+    </button>
+
+  </form>
+
+  <div id="message" class="message"></div>
+
+  <a class="back" href="index.html">
+    ← Back to Home
+  </a>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+  "https://ttuhcdgclnsxhoypfwhk.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_u_U8gTism0c2pgGLlh-FIw_m4re6VSG";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+const form = document.getElementById("loginForm");
+const loginBtn = document.getElementById("loginBtn");
+const message = document.getElementById("message");
+
+function showMessage(text, type){
+
+  message.textContent = text;
+
+  message.className = "message " + type;
+
+  message.style.display = "block";
+
+}
+
+form.addEventListener("submit", async function(e){
+
+  e.preventDefault();
+
+  message.style.display = "none";
+
+  loginBtn.disabled = true;
+  loginBtn.textContent = "Logging in...";
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  try{
+
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+    if(error){
+      throw error;
+    }
+
+    const user = data.user;
+
+    const { data: profile, error: profileError } =
+      await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+    if(profileError){
+      await supabase.auth.signOut();
+      throw new Error(
+        "Your account profile could not be found."
+      );
+    }
+
+    if(profile.role === "teacher"){
+
+      showMessage(
+        "Teacher login successful. Opening dashboard...",
+        "success"
+      );
+
+      setTimeout(function(){
+        window.location.href = "teacher.html";
+      }, 700);
+
+    }
+
+    else if(profile.role === "admin"){
+
+      showMessage(
+        "Admin login successful. Opening dashboard...",
+        "success"
+      );
+
+      setTimeout(function(){
+        window.location.href = "admin-dashboard.html";
+      }, 700);
+
+    }
+
+    else{
+
+      await supabase.auth.signOut();
+
+      throw new Error(
+        "This account is not authorized as Teacher or Admin."
+      );
+
+    }
+
+  }
+
+  catch(error){
+
+    showMessage(
+      error.message || "Login failed. Please try again.",
+      "error"
+    );
+
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Login";
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
