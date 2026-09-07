@@ -188,20 +188,23 @@ throw result.error;
 
 const user=result.data.user;
 
-const profileResult =
+  const profileResult =
 await supabaseClient
 .from("profiles")
-.select("role")
-.eq("id",user.id)
-.single();
+.select("id, role")
+.eq("id", user.id);
 
 if(profileResult.error){
+throw profileResult.error;
+}
+
+if(!profileResult.data || profileResult.data.length === 0){
 throw new Error(
-"Login worked, but your profile was not found."
+"Login worked, but no profile exists for this account."
 );
 }
 
-const role=profileResult.data.role;
+const role = profileResult.data[0].role;
 
 if(role==="teacher"){
 
