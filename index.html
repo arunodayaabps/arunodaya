@@ -724,7 +724,17 @@ Making Science beautiful, simple and easy to explore.
 
 </footer>
 
-<script></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://ttuhcdgclnsxhoypfwhk.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_u_U8gTism0c2pgGLlh-FIw_m4re6VSG";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+</script>
 
 </body>
 </html>
